@@ -1,0 +1,89 @@
+https://mdbootstrap.com/docs/react/extended/login-form/ 
+login form change karna hai for google and github and facebook
+
+
+# Project Setup Guide - Pinterest Clone (MERN)
+
+This project has two parts:
+1. Backend (Node.js + Express + MongoDB)
+2. Frontend (React + Vite)
+
+Both must be set up separately.
+
+----------------------------------------
+1. Clone the repository
+----------------------------------------
+git clone https://github.com/sadiklaliwala/SDP_SEM3_PinBoard_MERN.git
+cd pinterest-clone-main
+
+----------------------------------------
+2. Setup Backend
+----------------------------------------
+cd Backend
+
+# Install dependencies
+npm install
+
+# Create environment file
+# Copy the example and update values
+cp .env.example .env
+
+# Required .env variables:
+MONGODB_URI=your_mongodb_connection_string
+CLOUDINARY_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+JWT_SECRET=your_secret_key
+PORT=5000
+
+# Run backend
+npm run dev
+
+Backend will start at http://localhost:5000
+
+----------------------------------------
+3. Setup Frontend
+----------------------------------------
+cd ../Frontend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Required .env variables:
+VITE_API_URL=http://localhost:5000
+
+# Run frontend
+npm run dev
+
+Frontend will start at http://localhost:5173
+
+----------------------------------------
+4. Database
+----------------------------------------
+Make sure MongoDB is running locally 
+or use MongoDB Atlas with the URI in Backend/.env
+
+----------------------------------------
+5. Notes
+----------------------------------------
+- Do NOT commit `.env` files.
+- node_modules/ are ignored, so everyone must run `npm install` locally.
+- If vulnerabilities show up, run: npm audit fix
+- If dependency conflicts occur, run: npm install --legacy-peer-deps
+
+----------------------------------------
+6. Common Commands
+----------------------------------------
+# Start backend
+cd Backend && npm run dev
+
+# Start frontend
+cd Frontend && npm run dev
+
+----------------------------------------
+Everything should now be running 🎉
+Frontend -> http://localhost:5173
+Backend -> http://localhost:5000

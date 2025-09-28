@@ -1,0 +1,18 @@
+# Node modules
+Frontend/node_modules/
+Backend/node_modules/
+
+# Environment files
+Frontend/.env
+Frontend/.env.local
+Frontend/.env.*.local
+Backend/.env
+Backend/.env.local
+Backend/.env.*.local
+
+# Build outputs
+Frontend/dist/
+Backend/dist/
+Backend/build/
+
+dist/
