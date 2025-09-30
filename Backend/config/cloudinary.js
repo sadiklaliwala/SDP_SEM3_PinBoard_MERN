@@ -9,20 +9,21 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+console.log(process.env.CLOUDINARY_CLOUD_NAME, process.env.CLOUDINARY_API_KEY, process.env.CLOUDINARY_API_SECRET);
 
 // Function to upload file to Cloudinary
 const uploadToCloudinary = (buffer, filename) => {
   try {
     // Validate input
     if (!buffer || !filename) return null;
-
+    const sanitizedFilename = filename.replace(/\s+/g, '_');
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            resource_type: 'auto', // Automatically detect resource type (image, video, etc.)
-            public_id: filename, // Use original filename as public ID
-            folder: 'pinterest_clone', // Optional: specify a folder in Cloudinary
+            resource_type: 'auto',
+            public_id: sanitizedFilename,
+            folder: 'pinterest_clone',
           },
           (error, result) => {
             if (error) {

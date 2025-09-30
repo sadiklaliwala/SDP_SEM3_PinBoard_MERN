@@ -9,6 +9,12 @@ export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
+    console.log(name);
+    if (!name) {
+      return res
+        .status(400)
+        .json({ success: false, message: "User Can't be Blacked"});
+    }
     // Check if the user already exists
     const userExists = await UserModel.findOne({ email });
 
@@ -32,6 +38,8 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
+    console.log(name,email,password);
+
     // Hashing the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -40,6 +48,7 @@ export const registerUser = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
+      username:name // bcz user doesnt provide me username 
     });
 
     await user.save();

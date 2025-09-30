@@ -15,7 +15,8 @@ const PinContextProvider = ({ children }) => {
 
   // Create API instance outside of render cycle to prevent recreation
   const api = useMemo(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = "http://localhost:5000";
     return axios.create({
       baseURL: backendUrl,
       withCredentials: true,
