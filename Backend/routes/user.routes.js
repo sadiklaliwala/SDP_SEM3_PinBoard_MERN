@@ -15,6 +15,11 @@ import {
   updateMyProfile,
 } from '../controllers/user.controller.js';
 
+
+userRouter.post('/test', (req,res)=>{
+  res.json({msg:"Data is "+req.data});
+});
+
 // /api/auth/register
 userRouter.post('/register', registerUser);
 

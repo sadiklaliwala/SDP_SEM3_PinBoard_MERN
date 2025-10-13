@@ -4,16 +4,38 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { uploadToCloudinary } from '../config/cloudinary.js';
 
+const CreateTokenandSetCookies = (res, user) => {
+  const token = jwt.sign({
+    id: user._id,//mogoose id 
+    email: user.email
+  },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRE
+    }
+  );
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  // res.cookie('token', token, { maxAge: 9000000, httpOnly: true, secure: false });
+
+}
+
 // Route for user registration/sign-up  --> (POST) /api/auth/register
 export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    console.log(name);
+    console.log(name, email, password);
     if (!name) {
       return res
         .status(400)
-        .json({ success: false, message: "User Can't be Blacked"});
+        .json({ success: false, message: "User Can't be Blanked" });
     }
     // Check if the user already exists
     const userExists = await UserModel.findOne({ email });
@@ -38,37 +60,37 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
-    console.log(name,email,password);
+    console.log(name, email, password);
 
     // Hashing the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = new UserModel({
-      name,
+      name: name,
       email,
       password: hashedPassword,
-      username:name // bcz user doesnt provide me username 
+      username: name // bcz user doesnt provide me username 
     });
-
+    CreateTokenandSetCookies(res, user);
     await user.save();
 
     // Create JWT token
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRE,
-      }
-    );
+    // const token = jwt.sign(
+    //   { id: user._id, email: user.email },
+    //   process.env.JWT_SECRET,
+    //   {
+    //     expiresIn: process.env.JWT_EXPIRE,
+    //   }
+    // );
 
-    // Send the token in a HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    // // Send the token in a HTTP-only cookie
+    // res.cookie('token', token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    // });
 
     // Send the response
     res.status(201).json({
