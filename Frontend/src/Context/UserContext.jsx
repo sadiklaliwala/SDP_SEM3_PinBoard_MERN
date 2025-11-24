@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { createContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import axios from "axios";
+import { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const UserContext = createContext();
 
@@ -26,7 +26,7 @@ const UserContextProvider = ({ children }) => {
   const userRegister = async (name, email, password) => {
     setBTnLoading(true);
     try {
-      const response = await api.post('/api/auth/register', {
+      const response = await api.post("/api/auth/register", {
         name,
         email,
         password,
@@ -36,12 +36,12 @@ const UserContextProvider = ({ children }) => {
         toast.success(response.data.message);
         setCurrentUser(response.data.user);
         setIsAuthenticated(true);
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      console.log('Registration error:', error);
+      console.log("Registration error:", error);
       const errorMessage =
-        error.response?.data?.message || 'Registration failed';
+        error.response?.data?.message || "Registration failed";
       toast.error(errorMessage);
     } finally {
       setBTnLoading(false);
@@ -51,7 +51,7 @@ const UserContextProvider = ({ children }) => {
   const userLogin = async (email, password) => {
     try {
       setBTnLoading(true);
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post("/api/auth/login", {
         email,
         password,
       });
@@ -62,11 +62,11 @@ const UserContextProvider = ({ children }) => {
         setCurrentUser(userData);
         setIsAuthenticated(true);
         toast.success(response.data.message);
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      console.error('Login error:', error.response);
-      const errorMessage = error.response?.data?.message || 'Login failed';
+      console.error("Login error:", error.response);
+      const errorMessage = error.response?.data?.message || "Login failed";
       toast.error(errorMessage);
     } finally {
       setBTnLoading(false);
@@ -76,16 +76,16 @@ const UserContextProvider = ({ children }) => {
   const userLogout = async () => {
     try {
       setBTnLoading(true);
-      const response = await api.post('/api/auth/logout');
+      const response = await api.post("/api/auth/logout");
 
       if (response.data.success) {
         setCurrentUser(null);
         setIsAuthenticated(false);
         toast.success(response.data.message);
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       toast.error(error.response.data.message);
     } finally {
       setBTnLoading(false);
@@ -95,7 +95,7 @@ const UserContextProvider = ({ children }) => {
   const fetchMyProfile = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/auth/me');
+      const response = await api.get("/api/auth/me");
 
       if (response.data.success) {
         setCurrentUser(response.data.user);
@@ -104,7 +104,7 @@ const UserContextProvider = ({ children }) => {
     } catch (error) {
       setCurrentUser(null);
       setIsAuthenticated(false);
-      console.log('Fetch Current User error: ', error);
+      console.log("Fetch Current User error: ", error);
     } finally {
       setLoading(false);
     }
@@ -113,24 +113,24 @@ const UserContextProvider = ({ children }) => {
   const updateProfile = async (formData) => {
     try {
       setLoading(true);
-      const response = await api.put('/api/auth/profile', formData, {
+      const response = await api.put("/api/auth/profile", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Important
+          "Content-Type": "multipart/form-data", // Important
         },
       });
 
       if (response.data.success) {
         await fetchMyProfile();
-        toast.success('Profile updated successfully');
+        toast.success("Profile updated successfully");
         navigate(`/myprofile`); // Redirect to profile page
       }
     } catch (error) {
       console.error(
-        'Error updating user profile:',
+        "Error updating user profile:",
         error.response?.data || error.message
       );
       toast.error(
-        error.response?.data?.message || 'Error updating user profile'
+        error.response?.data?.message || "Error updating user profile"
       );
       setLoading(false);
     }
@@ -141,16 +141,16 @@ const UserContextProvider = ({ children }) => {
       setLoading(true);
       const response = await api.put(`/api/auth/follow/${userId}`);
 
-      console.log('Toggle Follow/Unfollow response:', response.data);
+      console.log("Toggle Follow/Unfollow response:", response.data);
 
       if (response.data.success) {
         await fetchMyProfile();
         toast.success(response.data.message);
       }
     } catch (error) {
-      console.error('Error toggling follow/unfollow:', error.response?.data);
+      console.error("Error toggling follow/unfollow:", error.response?.data);
       toast.error(
-        error.response?.data?.message || 'Error toggling follow/unfollow'
+        error.response?.data?.message || "Error toggling follow/unfollow"
       );
     } finally {
       setLoading(false);
@@ -167,8 +167,51 @@ const UserContextProvider = ({ children }) => {
         setIsAuthenticated(true);
       }
     } catch (error) {
-      console.log('Fetch User error: ', error);
+      console.log("Fetch User error: ", error);
       toast.error(error.message);
+    }
+  };
+
+  // Google OAuth Login
+  const googleLogin = () => {
+    window.location.href = `${backendUrl}/api/auth/google`;
+  };
+
+  // GitHub OAuth Login
+  const githubLogin = () => {
+    window.location.href = `${backendUrl}/api/auth/github`;
+  };
+  
+
+  // Facebook OAuth Login
+  const facebookLogin = () => {
+    window.location.href = `${backendUrl}/api/auth/facebook`;
+  };
+
+  // Handle OAuth Success Callback
+  const handleOAuthCallback = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get("error");
+
+    if (error === "auth_failed") {
+      toast.error("Authentication failed. Please try again.");
+      navigate("/login");
+      return;
+    }
+
+    // Check if we're on the auth-success page
+    if (window.location.pathname === "/auth-success") {
+      try {
+        setLoading(true);
+        await fetchMyProfile();
+        toast.success("Login successful!");
+        navigate("/");
+      } catch (error) {
+        toast.error("Failed to fetch user profile");
+        navigate("/login");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -195,6 +238,10 @@ const UserContextProvider = ({ children }) => {
     toggleFollowUnfollow,
     fetchUser,
     user,
+    googleLogin,
+    githubLogin,
+    facebookLogin,
+    handleOAuthCallback,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -10,7 +10,6 @@ const PinContextProvider = ({ children }) => {
   const [pins, setPins] = useState([]);
   const [currentPin, setCurrentPin] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-
   const navigate = useNavigate();
 
   // Create API instance outside of render cycle to prevent recreation

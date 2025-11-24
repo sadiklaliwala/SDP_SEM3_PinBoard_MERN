@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routes/user.routes.js';
 import pinRouter from './routes/pin.routes.js';
 import commentRouter from './routes/comment.routes.js';
+import session from 'express-session';
+import passport from './config/Passport.js';
 
 // App Config
 const app = express();
@@ -31,6 +33,21 @@ const corsOptions = {
 };
 
 app.options('*', cors(corsOptions));
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middlewares
 app.use(express.json());

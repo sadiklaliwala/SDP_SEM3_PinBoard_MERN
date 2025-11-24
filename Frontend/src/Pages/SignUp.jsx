@@ -16,7 +16,7 @@ const SignUp = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    setBTnLoading(true);
+    // setBTnLoading(true);
     userRegister(name, email, password);
   };
 

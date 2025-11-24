@@ -1,6 +1,6 @@
 import express from 'express';
 const userRouter = express.Router();
-
+import passport from 'passport';
 import isAuthenticated from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
 
@@ -14,10 +14,15 @@ import {
   registerUser,
   updateMyProfile,
 } from '../controllers/user.controller.js';
+import {
+  googleAuthSuccess,
+  githubAuthSuccess,
+  oauthFailure,
+  getCurrentUseroAuth,
+} from '../controllers/oauthController.js';
 
-
-userRouter.post('/test', (req,res)=>{
-  res.json({msg:"Data is "+req.data});
+userRouter.post('/test', (req, res) => {
+  res.json({ msg: "Data is " + req.data });
 });
 
 // /api/auth/register
@@ -25,6 +30,42 @@ userRouter.post('/register', registerUser);
 
 // /api/auth/login
 userRouter.post('/login', loginUser);
+
+// Google OAuth Routes
+// /api/auth/login/google
+userRouter.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+// /api/auth/login/google/callback
+userRouter.get(
+  '/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/api/auth/failure',
+    session: true
+  }),
+  googleAuthSuccess
+);
+
+// GitHub OAuth Routes
+// /api/auth/login/github
+userRouter.get(
+  '/github',
+  passport.authenticate('github', { scope: ['user:email'] })
+);
+
+// /api/auth/login/github/callback
+userRouter.get(
+  '/github/callback',
+  passport.authenticate('github', {
+    failureRedirect: '/api/auth/failure',
+    session: true
+  }),
+  githubAuthSuccess
+);
+
+// OAuth Failure Route
+userRouter.get('/failure', oauthFailure);
 
 // /api/auth/logout
 userRouter.post('/logout', logoutUser);
