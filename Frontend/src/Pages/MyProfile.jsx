@@ -18,18 +18,18 @@ const MyProfile = () => {
   }
 
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className="flex flex-col min-h-screen bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100">
       <ProfileHeader user={currentUser} />
 
-      <hr className='border-gray-600 w-full mt-5' />
+      <hr className="border-gray-600 dark:border-gray-400 w-full mt-5" />
 
       {userPins.length === 0 && (
-        <div className='flex flex-col items-center gap-3 justify-center min-h-[40vh]'>
-          <p className='mt-4'>
+        <div className="flex flex-col items-center gap-3 justify-center min-h-[40vh]">
+          <p className="mt-4">
             Nothing to show...yet! Pins you create will live here.
           </p>
-          <NavLink to='/create-pin'>
-            <button className='py-2 px-3 bg-red-500 text-white rounded-full cursor-pointer'>
+          <NavLink to="/create-pin">
+            <button className="py-2 px-3 bg-red-500 text-white rounded-full cursor-pointer hover:bg-red-600 transition-colors">
               Create Pin
             </button>
           </NavLink>
@@ -38,8 +38,8 @@ const MyProfile = () => {
 
       {/* pin details */}
       {userPins.length > 0 && (
-        <div className='mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl'>
-          <div className='columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 mt-4'>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 mt-4">
             {userPins.map((pin) => (
               <PinCard pin={pin} key={pin._id} />
             ))}

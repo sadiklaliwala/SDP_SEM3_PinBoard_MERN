@@ -37,7 +37,6 @@ const EditMyProfile = () => {
 
     const formData = new FormData();
 
-    // Only append image if a new one was selected
     if (profileImage) {
       formData.append('profileImage', profileImage);
     }
@@ -50,10 +49,10 @@ const EditMyProfile = () => {
   };
 
   return (
-    <div className='flex justify-center items-center min-h-screen bg-gray-50 mt-5'>
-      <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-md'>
-        <h2 className='text-2xl font-semibold mb-2'>Edit Profile</h2>
-        <p className='text-sm text-gray-500 mb-6'>
+    <div className='flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900 mt-5'>
+      <div className='bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md'>
+        <h2 className='text-2xl font-semibold mb-2 text-gray-900 dark:text-gray-100'>Edit Profile</h2>
+        <p className='text-sm text-gray-500 dark:text-gray-400 mb-6'>
           Keep your personal details private. Information you add here is
           visible to anyone who can view your profile.
         </p>
@@ -63,11 +62,11 @@ const EditMyProfile = () => {
             <img
               src={imagePreview}
               alt='Preview'
-              className='w-24 h-24 rounded-full object-cover border border-gray-300'
+              className='w-24 h-24 rounded-full object-cover border border-gray-300 dark:border-gray-600'
             />
           ) : (
-            <div className='w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center'>
-              <i className='fa-solid fa-user text-7xl text-gray-800'></i>
+            <div className='w-32 h-32 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center'>
+              <i className='fa-solid fa-user text-7xl text-gray-800 dark:text-gray-300'></i>
             </div>
           )}
 
@@ -81,8 +80,8 @@ const EditMyProfile = () => {
           />
           <label
             htmlFor='file-upload'
-            className='mt-4 inline-block px-3 py-1 bg-gray-300 text-black font-semibold
-                rounded-full   cursor-pointer'
+            className='mt-4 inline-block px-3 py-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-gray-100 font-semibold
+                rounded-full cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-500'
           >
             {profileImage ? 'Change Image' : 'Upload Image'}
           </label>
@@ -90,21 +89,23 @@ const EditMyProfile = () => {
 
         <form onSubmit={updateProfileHandler} className='space-y-4'>
           <div>
-            <label htmlFor='fullname' className='block text-sm font-medium'>
+            <label htmlFor='fullname' className='block text-sm font-medium text-gray-900 dark:text-gray-100'>
               Full Name
             </label>
             <input
               type='text'
               name='fullname'
               placeholder='Full Name'
-              className='mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-red-500'
+              className='mt-1 w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+              focus:outline-none focus:ring-2 focus:ring-red-500'
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
           <div>
-            <label htmlFor='bio' className='block text-sm font-medium'>
+            <label htmlFor='bio' className='block text-sm font-medium text-gray-900 dark:text-gray-100'>
               Bio
             </label>
             <input
@@ -113,12 +114,14 @@ const EditMyProfile = () => {
               placeholder='introduce yourself...'
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className='mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-red-500'
+              className='mt-1 w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+              focus:outline-none focus:ring-2 focus:ring-red-500'
             />
           </div>
 
           <div>
-            <label htmlFor='username' className='block text-sm font-medium'>
+            <label htmlFor='username' className='block text-sm font-medium text-gray-900 dark:text-gray-100'>
               Username
             </label>
             <input
@@ -127,7 +130,9 @@ const EditMyProfile = () => {
               placeholder='user_name'
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className='mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-red-500'
+              className='mt-1 w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+              focus:outline-none focus:ring-2 focus:ring-red-500'
             />
           </div>
 
