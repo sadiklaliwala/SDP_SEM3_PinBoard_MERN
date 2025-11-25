@@ -35,7 +35,7 @@ const UnsplashGallery = () => {
         setHasMore(false);
       }
     } catch (error) {
-      console.error('Error fetching images:', error.response.data);
+      console.error('Error fetching images:', error.response?.data || error);
     }
   };
 
@@ -54,12 +54,12 @@ const UnsplashGallery = () => {
   };
 
   return (
-    <div className='p-4'>
+    <div className='p-4 bg-white dark:bg-neutral-900 min-h-screen'>
       {/* Search Input */}
       <input
         type='text'
         placeholder='Search images...'
-        className='border p-2 w-full'
+        className='border border-gray-300 dark:border-gray-600 p-2 w-full rounded-md bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500'
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -70,18 +70,18 @@ const UnsplashGallery = () => {
         hasMore={hasMore}
         loader={<Loading />}
         endMessage={
-          <p className='text-center my-4 text-gray-500'>
+          <p className='text-center my-4 text-gray-500 dark:text-gray-400'>
             No more images to load
           </p>
         }
       >
-        <div className='grid grid-cols-4 gap-4 mt-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4'>
           {images.map((img) => (
             <img
               key={img.id}
               src={img.urls.small}
-              alt={img.alt_description}
-              className='w-full h-40 object-cover rounded'
+              alt={img.alt_description || 'Unsplash Image'}
+              className='w-full h-40 object-cover rounded shadow-md'
             />
           ))}
         </div>

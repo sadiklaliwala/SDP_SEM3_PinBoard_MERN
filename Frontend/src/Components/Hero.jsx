@@ -3,11 +3,10 @@ import { useState } from 'react';
 const Hero = () => {
   const [activeSlide, setActiveSlide] = useState(0);
 
-  // Content for each slide
   const slides = [
     {
       headline: 'weeknight dinner idea',
-      color: 'text-yellow-600',
+      color: 'text-yellow-600 dark:text-yellow-400',
       images: [
         'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGZvb2R8ZW58MHx8MHx8fDA%3D',
@@ -17,7 +16,7 @@ const Hero = () => {
     },
     {
       headline: 'outfit inspiration',
-      color: 'text-[#C31958]',
+      color: 'text-[#C31958] dark:text-pink-400',
       images: [
         'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8Y2xvdGhpbmd8ZW58MHx8MHx8fDA%3D',
         'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fGNsb3RoaW5nfGVufDB8fDB8fHww',
@@ -27,7 +26,7 @@ const Hero = () => {
     },
     {
       headline: 'home decor idea',
-      color: 'text-[#0076D3]',
+      color: 'text-[#0076D3] dark:text-blue-400',
       images: [
         'https://i.pinimg.com/736x/dc/7d/37/dc7d3706bdc2c3e452c2823f0aa9ede5.jpg',
         'https://i.pinimg.com/736x/60/ce/bb/60cebb8bd5658a86c6cb667221223740.jpg',
@@ -37,7 +36,7 @@ const Hero = () => {
     },
     {
       headline: 'green thumb idea',
-      color: 'text-teal-800',
+      color: 'text-teal-800 dark:text-teal-400',
       images: [
         'https://images.unsplash.com/photo-1692052191004-73d930963a2f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGdyZWVuJTIwdGh1bWJ8ZW58MHx8MHx8fDA%3D',
         'https://images.unsplash.com/photo-1685905662935-458c9aa64f3a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjd8fGdyZWVuJTIwdGh1bWJ8ZW58MHx8MHx8fDA%3D',
@@ -51,15 +50,14 @@ const Hero = () => {
     setActiveSlide(index);
   };
 
-  // Get current slide data
   const currentSlide = slides[activeSlide];
 
   return (
     <div>
-      <div className='min-h-screen bg-white pb-2 '>
+      <div className='min-h-screen bg-white dark:bg-gray-900 pb-2'>
         {/* Hero Section */}
         <div className='mt-8 md:mt-16 text-center px-4'>
-          <h1 className='text-4xl text-gray-800 md:text-6xl font-bold mb-2 '>
+          <h1 className='text-4xl text-gray-800 dark:text-gray-100 md:text-6xl font-bold mb-2'>
             Get your next
           </h1>
           <h2
@@ -75,7 +73,7 @@ const Hero = () => {
                 key={index}
                 onClick={() => handleDotClick(index)}
                 className={`w-2 h-2 rounded-full cursor-pointer transition-colors duration-300 ${
-                  activeSlide === index ? 'bg-[#C31958]' : 'bg-gray-300'
+                  activeSlide === index ? 'bg-[#C31958]' : 'bg-gray-300 dark:bg-gray-600'
                 }`}
                 aria-label={`Slide ${index + 1}`}
               />
@@ -88,7 +86,7 @@ const Hero = () => {
           {currentSlide.images.map((image, index) => (
             <div
               key={index}
-              className='bg-gray-100 rounded-lg overflow-hidden h-56 transform transition-all duration-500 hover:shadow-lg hover:scale-105'
+              className='bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden h-56 transform transition-all duration-500 hover:shadow-lg hover:scale-105'
               style={{
                 transitionDelay: `${index * 100}ms`,
               }}

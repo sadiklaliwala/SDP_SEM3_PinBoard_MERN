@@ -6,12 +6,12 @@ import SeeIdeas from '../Components/SeeIdeas';
 
 const LandingPage = () => {
   return (
-    <>
+    <div className="bg-white dark:bg-neutral-900 min-h-screen text-gray-900 dark:text-gray-100">
       <Hero />
       <SearchIdeas />
       <SaveIdeas />
       <SeeIdeas />
-    </>
+    </div>
   );
 };
 
