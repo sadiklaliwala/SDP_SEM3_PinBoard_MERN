@@ -150,13 +150,12 @@ import { UserContext } from '../Context/UserContext';
 import { LoadingAnimation } from '../Components/Loading';
 import { useNavigate } from 'react-router-dom';
 
-const SignUp = () => {
-  const [name, setName] = useState('');
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { userRegister, btnloading, googleLogin, githubLogin, handleOAuthCallback } = useContext(UserContext);
+  const { userLogin, btnloading, googleLogin, githubLogin, handleOAuthCallback } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -167,7 +166,7 @@ const SignUp = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    userRegister(name, email, password);
+    userLogin(email, password);
   };
 
   return (
@@ -215,7 +214,7 @@ const SignUp = () => {
             className='py-2 rounded-full bg-red-600 text-white text-lg font-semibold hover:bg-red-700 transition-all cursor-pointer disabled:opacity-50'
             disabled={btnloading}
           >
-            {btnloading ? <LoadingAnimation /> : 'Sign up'}
+            {btnloading ? <LoadingAnimation /> : 'Login'}
           </button>
         </form>
 
@@ -284,10 +283,10 @@ const SignUp = () => {
           <p className='text-center text-gray-600 text-sm font-semibold'>
             Already a member?{' '}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/signup')}
               className='text-blue-600 cursor-pointer'
             >
-              Log in
+              Signup
             </button>
           </p>
         </div>
@@ -296,4 +295,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Login;
