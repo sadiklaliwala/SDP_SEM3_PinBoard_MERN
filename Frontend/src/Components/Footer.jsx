@@ -8,7 +8,7 @@ const Footer = () => {
           © 2025 Pinterest Clone by{' '}
           <a
             className='text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium'
-            href='https://github.com/faisal-din'
+            href='https://github.com/sadiklaliwala'
           >
             Sadik, Rahim and Fozan
           </a>
