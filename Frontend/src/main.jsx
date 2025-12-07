@@ -23,13 +23,17 @@ import { BrowserRouter } from 'react-router-dom';
 import UserContextProvider from './Context/UserContext.jsx';
 import PinContextProvider from './Context/PinContext.jsx';
 import { ThemeProvider } from './Context/ThemeToggleContext.jsx'; // ← import
+import PaymentContextProvider from './Context/PaymentContext.jsx'; // ✅ Import PaymentContext
+
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <UserContextProvider>
       <PinContextProvider>
         <ThemeProvider> {/* ← wrap App here */}
-          <App />
+          <PaymentContextProvider> {/* ✅ Wrap with PaymentContext */}
+            <App />
+          </PaymentContextProvider>
         </ThemeProvider>
       </PinContextProvider>
     </UserContextProvider>

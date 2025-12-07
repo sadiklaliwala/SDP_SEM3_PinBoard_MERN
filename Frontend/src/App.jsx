@@ -1,4 +1,3 @@
-// Neeche Comment me pehle ka code he.
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Footer from "./Components/Footer";
@@ -20,6 +19,8 @@ import MyProfile from "./Pages/MyProfile";
 import EditMyProfile from "./Pages/EditMyProfile";
 import CategoryPage from "./Pages/CategoryPage";
 import UserProfile from "./Pages/UserProfile";
+import PremiumPage from "./Pages/PremiumPage";
+import PaymentHistory from "./Pages/PaymentHistory";
 
 function App() {
   const { currentUser, isAuthenticated, loading } = useContext(UserContext);
@@ -74,6 +75,17 @@ function App() {
                 isAuthenticated ? <UserProfile /> : <Navigate to="/login" />
               }
             />
+            {/* ✅ NEW: Premium & Payment Routes */}
+            <Route
+              path="/premium"
+              element={<PremiumPage />}
+            />
+            <Route
+              path="/payment-history"
+              element={
+                isAuthenticated ? <PaymentHistory /> : <Navigate to="/login" />
+              }
+            />
           </Routes>
           <Footer />
         </div>
@@ -83,6 +95,7 @@ function App() {
 }
 
 export default App;
+// // Neeche Comment me pehle ka code he.
 // import { Navigate, Route, Routes } from "react-router-dom";
 // import "./App.css";
 // import Footer from "./Components/Footer";
@@ -113,56 +126,54 @@ export default App;
 //       {loading ? (
 //         <Loading />
 //       ) : (
-//         <>
-//           {/* <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 transition-colors duration-300"> */}
+//         <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
 //           <ToastContainer />
-//             <Navbar user={currentUser} />
-//             <Routes>
-//               <Route
-//                 path="/"
-//                 element={isAuthenticated ? <Home /> : <LandingPage />}
-//               />
-//               <Route
-//                 path="/explore"
-//                 element={!isAuthenticated ? <Explore /> : <Navigate to="/" />}
-//               />
-//               <Route path="create-pin" element={<CreatePin />} />
-//               <Route path="/pin/:pinId" element={<PinPage />} />
-//               <Route path="/edit-pin/:pinId" element={<EditPinPage />} />
-//               <Route
-//                 path="/category/:categoryName"
-//                 element={<CategoryPage />}
-//               />
-//               <Route
-//                 path="/login"
-//                 element={isAuthenticated ? <Navigate to="/" /> : <Login />}
-//               />
-//               <Route
-//                 path="/signup"
-//                 element={isAuthenticated ? <Navigate to="/" /> : <SignUp />}
-//               />
-//               <Route
-//                 path="/myprofile"
-//                 element={
-//                   isAuthenticated ? <MyProfile /> : <Navigate to="/login" />
-//                 }
-//               />
-//               <Route
-//                 path="/edit-myprofile"
-//                 element={
-//                   isAuthenticated ? <EditMyProfile /> : <Navigate to="/login" />
-//                 }
-//               />
-//               <Route
-//                 path="/user/:userId"
-//                 element={
-//                   isAuthenticated ? <UserProfile /> : <Navigate to="/login" />
-//                 }
-//               />
-//             </Routes>
-//             <Footer />
-//           {/* </div> */}
-//         </>
+//           <Navbar user={currentUser} />
+//           <Routes>
+//             <Route
+//               path="/"
+//               element={isAuthenticated ? <Home /> : <LandingPage />}
+//             />
+//             <Route
+//               path="/explore"
+//               element={!isAuthenticated ? <Explore /> : <Navigate to="/" />}
+//             />
+//             <Route path="create-pin" element={<CreatePin />} />
+//             <Route path="/pin/:pinId" element={<PinPage />} />
+//             <Route path="/edit-pin/:pinId" element={<EditPinPage />} />
+//             <Route
+//               path="/category/:categoryName"
+//               element={<CategoryPage />}
+//             />
+//             <Route
+//               path="/login"
+//               element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+//             />
+//             <Route
+//               path="/signup"
+//               element={isAuthenticated ? <Navigate to="/" /> : <SignUp />}
+//             />
+//             <Route
+//               path="/myprofile"
+//               element={
+//                 isAuthenticated ? <MyProfile /> : <Navigate to="/login" />
+//               }
+//             />
+//             <Route
+//               path="/edit-myprofile"
+//               element={
+//                 isAuthenticated ? <EditMyProfile /> : <Navigate to="/login" />
+//               }
+//             />
+//             <Route
+//               path="/user/:userId"
+//               element={
+//                 isAuthenticated ? <UserProfile /> : <Navigate to="/login" />
+//               }
+//             />
+//           </Routes>
+//           <Footer />
+//         </div>
 //       )}
 //     </>
 //   );
