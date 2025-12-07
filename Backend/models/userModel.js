@@ -62,6 +62,16 @@ const userSchema = mongoose.Schema(
       enum: ['local', 'google', 'github'],
       default: 'local'
     },
+    transactions: [{
+      orderId: String,
+      paymentId: String,
+      amount: Number,
+      currency: String,
+      status: String,
+      createdAt: { type: Date, default: Date.now }
+    }],
+    isPremium: { type: Boolean, default: false },
+    premiumExpiry: Date,
   },
   {
     timestamps: true,

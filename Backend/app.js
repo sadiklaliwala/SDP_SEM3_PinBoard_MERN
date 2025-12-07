@@ -8,6 +8,8 @@ import pinRouter from './routes/pin.routes.js';
 import commentRouter from './routes/comment.routes.js';
 import session from 'express-session';
 import passport from './config/Passport.js';
+import paymentRouter from './routes/paymentRoutes.js';
+
 
 // App Config
 const app = express();
@@ -56,6 +58,8 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // API Endpoints
+
+app.use('/api/payment', paymentRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/pins', pinRouter);
 app.use('/api/pins/:pinId/comments', commentRouter);

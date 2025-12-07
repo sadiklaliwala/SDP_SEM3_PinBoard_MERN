@@ -5,7 +5,7 @@ export const googleAuthSuccess = async (req, res) => {
   try {
     // User is available in req.user from passport
     const user = req.user;
-    
+
     if (!user) {
       return res.redirect(`${process.env.FRONTEND_URL}`);
     }
@@ -25,11 +25,11 @@ export const googleAuthSuccess = async (req, res) => {
 export const githubAuthSuccess = async (req, res) => {
   try {
     const user = req.user;
-    
+
     if (!user) {
       return res.redirect(`${process.env.FRONTEND_URL}`);
     }
-    
+
     CreateTokenandSetCookies(res, user);
 
     res.redirect(`${process.env.FRONTEND_URL}`);
