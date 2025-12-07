@@ -1,31 +1,47 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const pinSchema = mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     image: { type: String, required: true },
+
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
+
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment',
+        ref: "Comment",
       },
     ],
 
-    likes: { type: Number, default: 0 },
-    likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    reactions: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        reaction: {
+          type: String,
+          enum: ["like", "love", "wow", "sad", "angry"],
+        },
+      },
+    ],
+
+    reactionCounts: {
+      like: { type: Number, default: 0 },
+      love: { type: Number, default: 0 },
+      wow: { type: Number, default: 0 },
+      sad: { type: Number, default: 0 },
+      angry: { type: Number, default: 0 }
+    },
+
     category: { type: String, required: true, trim: true },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const PinModel = mongoose.model.Pin || mongoose.model('Pin', pinSchema);
+const PinModel = mongoose.models.Pin || mongoose.model("Pin", pinSchema);
 
 export default PinModel;

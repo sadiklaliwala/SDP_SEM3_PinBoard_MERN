@@ -9,6 +9,7 @@ import {
   getSinglePin,
   likePin,
   updatePin,
+  reactToPin, // <-- Import the new controller
 } from '../controllers/pin.controller.js';
 
 pinRouter.get('/', isAuthenticated, getAllPins);
@@ -22,5 +23,8 @@ pinRouter.put('/:id', isAuthenticated, upload.single('image'), updatePin);
 pinRouter.delete('/:id', isAuthenticated, deletePin);
 
 pinRouter.put('/:id/toggleLike', isAuthenticated, likePin);
+
+// NEW route for reacting to a pin --> PUT /api/pins/:id/react
+pinRouter.put('/:id/react', isAuthenticated, reactToPin);
 
 export default pinRouter;

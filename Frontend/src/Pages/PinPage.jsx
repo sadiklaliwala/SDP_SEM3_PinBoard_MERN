@@ -5,6 +5,15 @@ import { UserContext } from '../Context/UserContext';
 import { PinContext } from '../Context/PinContext';
 import CommentItem from '../Components/CommentItem';
 
+const reactionsList = ['like', 'love', 'wow', 'sad', 'angry'];
+const reactionIcons = {
+  like: '❤️',
+  love: '😍',
+  wow: '😮',
+  sad: '😢',
+  angry: '😡',
+};
+
 const PinPage = () => {
   const { currentUser, isAuthenticated, navigate, toggleFollowUnfollow } =
     useContext(UserContext);
@@ -13,7 +22,7 @@ const PinPage = () => {
     deletePin,
     createComment,
     deleteComment,
-    togglePinLike,
+    reactToPin,
   } = useContext(PinContext);
 
   const { pinId } = useParams();
@@ -22,6 +31,7 @@ const PinPage = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [localPin, setLocalPin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -55,7 +65,17 @@ const PinPage = () => {
     );
   }
 
-  const handleLike = () => togglePinLike(pinId);
+  // Handle reaction
+  const handleReaction = async (reactionType) => {
+    if (!isAuthenticated) return;
+    
+    await reactToPin(pinId, reactionType);
+    
+    // Refresh pin data
+    const updatedPin = await fetchSinglePin(pinId, true);
+    setLocalPin(updatedPin);
+    setShowReactionPicker(false);
+  };
 
   const handleCreateComment = (e) => {
     e.preventDefault();
@@ -83,6 +103,14 @@ const PinPage = () => {
     .map((id) => id.toString())
     .includes(currentUser._id.toString());
 
+  // Get user's current reaction
+  const userReaction = currentUser && localPin.reactions
+    ? localPin.reactions.find((r) => r.user.toString() === currentUser._id.toString())?.reaction
+    : null;
+
+  // Get total reactions
+  const totalReactions = Object.values(localPin.reactionCounts || {}).reduce((a, b) => a + b, 0);
+
   return (
     <div className="mx-5 md:mx-8 lg:mx-14 xl:mx-[72px] flex items-center justify-center dark:bg-neutral-900">
       <div className="mt-16 flex flex-col md:flex-row items-stretch bg-white dark:bg-neutral-800 shadow-lg rounded-2xl overflow-hidden w-full md:max-h-[90vh] max-w-6xl border border-gray-400 dark:border-neutral-700">
@@ -102,29 +130,65 @@ const PinPage = () => {
           <div className="py-2 px-3 overflow-y-auto flex-1">
 
             {/* Header */}
-            <div className="sticky top-0 flex items-center justify-between z-10 dark:bg-neutral-900">
-              <div className="flex items-center space-x-4">
+            <div className="sticky top-0 flex items-center justify-between z-10 bg-amber-50 dark:bg-neutral-900 pb-2">
+              <div className="flex items-center space-x-3">
 
-                {/* Like Button */}
-                <button
-                  className="flex items-center space-x-2 cursor-pointer"
-                  onClick={handleLike}
+                {/* Facebook-style Like Button with Reaction Picker */}
+                <div 
+                  className="relative"
+                  onMouseEnter={() => setShowReactionPicker(true)}
+                  onMouseLeave={() => setShowReactionPicker(false)}
                 >
-                  <i
-                    className={`fa-solid fa-heart text-xl ${
-                      localPin.likedBy.includes(currentUser._id)
-                        ? 'text-red-600'
-                        : 'text-gray-500 dark:text-gray-300'
-                    }`}
-                  ></i>
-                  <p className="text-lg text-gray-700 dark:text-gray-300">
-                    {localPin.likes}
-                  </p>
-                </button>
+                  {/* Main Like Button */}
+                  <button
+                    onClick={() => handleReaction(userReaction || 'like')}
+                    disabled={!isAuthenticated}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+                      userReaction
+                        ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+                        : 'bg-gray-200 dark:bg-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-neutral-600'
+                    } ${!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  >
+                    <span className="text-xl">
+                      {userReaction ? reactionIcons[userReaction] : '👍'}
+                    </span>
+                    <span className="font-medium text-sm">
+                      {userReaction ? userReaction.charAt(0).toUpperCase() + userReaction.slice(1) : 'Like'}
+                    </span>
+                    {totalReactions > 0 && (
+                      <span className="text-xs bg-white dark:bg-neutral-800 px-2 py-0.5 rounded-full">
+                        {totalReactions}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Reaction Picker - Appears on Hover */}
+                  {showReactionPicker && isAuthenticated && (
+                    <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-neutral-800 shadow-2xl rounded-full px-3 py-2 flex gap-2 border border-gray-200 dark:border-neutral-700 animate-[slideUp_0.2s_ease-out]">
+                      {reactionsList.map((reaction) => (
+                        <button
+                          key={reaction}
+                          onClick={() => handleReaction(reaction)}
+                          className="relative group"
+                          title={reaction}
+                        >
+                          <div className="flex flex-col items-center hover:scale-125 transition-transform duration-200">
+                            <span className="text-3xl">{reactionIcons[reaction]}</span>
+                          </div>
+                          {/* Tooltip */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-gray-800 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {reaction.charAt(0).toUpperCase() + reaction.slice(1)}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* Share */}
-                <button className="px-2 py-1 bg-gray-200 dark:bg-neutral-700 rounded-full hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer">
+                <button className="px-4 py-2 bg-gray-200 dark:bg-neutral-700 rounded-full hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer flex items-center gap-2">
                   <i className="fa-solid fa-share text-lg dark:text-gray-200"></i>
+                  <span className="font-medium text-sm text-gray-600 dark:text-gray-300">Share</span>
                 </button>
 
                 {/* Menu */}
@@ -163,6 +227,26 @@ const PinPage = () => {
                 Save
               </button>
             </div>
+
+            {/* Reaction Summary (show who reacted) */}
+            {totalReactions > 0 && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex -space-x-1">
+                  {Object.entries(localPin.reactionCounts || {})
+                    .filter(([_, count]) => count > 0)
+                    .slice(0, 3)
+                    .map(([type, _]) => (
+                      <span
+                        key={type}
+                        className="inline-flex items-center justify-center w-6 h-6 bg-white dark:bg-neutral-800 rounded-full border border-gray-200 dark:border-neutral-700"
+                      >
+                        {reactionIcons[type]}
+                      </span>
+                    ))}
+                </div>
+                <span>{totalReactions} {totalReactions === 1 ? 'reaction' : 'reactions'}</span>
+              </div>
+            )}
 
             {/* Title */}
             <h1 className="text-3xl font-semibold mt-4 text-gray-800 dark:text-gray-100">
