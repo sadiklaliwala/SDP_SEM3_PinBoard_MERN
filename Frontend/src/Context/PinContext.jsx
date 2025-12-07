@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useEffect, useMemo, useState ,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { UserContext } from "../Context/UserContext";
 
 export const PinContext = createContext();
 
@@ -10,11 +11,10 @@ const PinContextProvider = ({ children }) => {
   const [pins, setPins] = useState([]);
   const [currentPin, setCurrentPin] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const { currentUser, loading: userLoading } = useContext(UserContext); // add this and also import useContext and UserContext.jsx
   const navigate = useNavigate();
 
-  // Create API instance outside of render cycle to prevent recreation
   const api = useMemo(() => {
-    // const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const backendUrl = "http://localhost:5000";
     return axios.create({
       baseURL: backendUrl,
@@ -26,9 +26,7 @@ const PinContextProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await api.get('/api/pins');
-      if (response.data.success) {
-        setPins(response.data.pins);
-      }
+      if (response.data.success) setPins(response.data.pins);
     } catch (error) {
       console.log('Error fetching pins:', error);
     } finally {
@@ -48,32 +46,18 @@ const PinContextProvider = ({ children }) => {
     }
   };
 
-  const createPin = async (
-    formData,
-    setImage,
-    setImagePreview,
-    setTitle,
-    setDescription
-  ) => {
+  const createPin = async (formData, setImage, setImagePreview, setTitle, setDescription) => {
     setLoading(true);
     try {
       const response = await api.post('/api/pins/create', formData, {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
       if (response.data.success) {
-        // Update the pins state with the new pin
-        setPins((prevPins) => [...prevPins, response.data.savedPin]);
-
-        // Reset form
+        setPins(prev => [...prev, response.data.savedPin]);
         setImage(null);
         setImagePreview(null);
         setTitle('');
         setDescription('');
-
         toast.success('Pin created successfully');
         await fetchAllPins();
         navigate('/');
@@ -90,21 +74,15 @@ const PinContextProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await api.put(`/api/pins/${pinId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
       if (response.data.success) {
         toast.success('Pin updated successfully');
         await fetchSinglePin(pinId);
         navigate(`/pin/${pinId}`);
       }
     } catch (error) {
-      console.error(
-        'Error updating pin:',
-        error.response?.data || error.message
-      );
+      console.error('Error updating pin:', error.response?.data || error.message);
       toast.error(error.response?.data?.message || 'Error updating pin');
     } finally {
       setLoading(false);
@@ -114,14 +92,13 @@ const PinContextProvider = ({ children }) => {
   const deletePin = async (pinId) => {
     try {
       const response = await api.delete(`/api/pins/${pinId}`);
-
       if (response.data.success) {
         toast.success('Pin deleted successfully');
         await fetchAllPins();
         navigate('/');
       }
     } catch (error) {
-      console.log('Error deleting pin:', error.response.data);
+      console.log('Error deleting pin:', error.response?.data);
       toast.error(error.response?.data?.message || 'Error deleting pin');
     }
   };
@@ -129,40 +106,55 @@ const PinContextProvider = ({ children }) => {
   const togglePinLike = async (pinId) => {
     try {
       const response = await api.put(`/api/pins/${pinId}/toggleLike`);
-
       if (response.data.success) {
-        // Update the currentPin if it is the same pin
         if (currentPin && currentPin._id === pinId) {
-          setCurrentPin((prevPin) => ({
-            ...prevPin,
+          setCurrentPin(prev => ({
+            ...prev,
             likes: response.data.pin.likes,
             likedBy: response.data.liked,
           }));
         }
-
-        // Update the pins array if needed
-        setPins((prevPins) =>
-          prevPins.map((pin) =>
-            pin._id === pinId
-              ? {
-                  ...pin,
-                  likes: response.data.pin.likes,
-                  likedBy: response.data.liked,
-                }
-              : pin
-          )
-        );
+        setPins(prev => prev.map(pin => 
+          pin._id === pinId 
+            ? { ...pin, likes: response.data.pin.likes, likedBy: response.data.liked }
+            : pin
+        ));
       }
     } catch (error) {
       console.error('Error liking pin:', error);
     }
   };
 
+  // ✅ New: Multi-reaction support
+  const reactToPin = async (pinId, reactionType) => {
+    try {
+      const response = await api.put(`/api/pins/${pinId}/react`, { reaction: reactionType });
+      if (response.data.success) {
+        if (currentPin && currentPin._id === pinId) {
+          setCurrentPin(prev => ({
+            ...prev,
+            reactions: response.data.pin.reactions,
+            reactionCounts: response.data.pin.reactionCounts,
+          }));
+        }
+        setPins(prev => prev.map(pin =>
+          pin._id === pinId
+            ? {
+                ...pin,
+                reactions: response.data.pin.reactions,
+                reactionCounts: response.data.pin.reactionCounts,
+              }
+            : pin
+        ));
+      }
+    } catch (error) {
+      console.error('Error reacting to pin:', error);
+    }
+  };
+
   const createComment = async (comment, setComment, pinId) => {
     try {
-      const { data } = await api.post(`/api/pins/${pinId}/comments/create`, {
-        comment,
-      });
+      const { data } = await api.post(`/api/pins/${pinId}/comments/create`, { comment });
       toast.success(data.message);
       setComment('');
       await fetchSinglePin(pinId);
@@ -174,10 +166,7 @@ const PinContextProvider = ({ children }) => {
 
   const deleteComment = async (pinId, commentId) => {
     try {
-      const { data } = await api.delete(
-        `/api/pins/${pinId}/comments/${commentId}`
-      );
-
+      const { data } = await api.delete(`/api/pins/${pinId}/comments/${commentId}`);
       await fetchSinglePin(currentPin._id);
       toast.success(data.message);
     } catch (error) {
@@ -185,9 +174,13 @@ const PinContextProvider = ({ children }) => {
     }
   };
 
+  // useEffect(() => { fetchAllPins(); }, []);
   useEffect(() => {
-    fetchAllPins();
-  }, []);
+    if (!userLoading && currentUser) {
+      fetchAllPins();
+    }
+  }, [userLoading, currentUser]);
+
 
   const values = {
     pins,
@@ -204,6 +197,7 @@ const PinContextProvider = ({ children }) => {
     createComment,
     deleteComment,
     togglePinLike,
+    reactToPin, // ✅ added
     searchTerm,
     setSearchTerm,
   };
