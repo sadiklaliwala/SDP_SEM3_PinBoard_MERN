@@ -2,6 +2,7 @@ import UserModel from '../models/userModel.js';
 import PinModel from '../models/pinModel.js';
 import CommentModel from '../models/comment.model.js';
 import PaymentModel from '../models/payment.js';
+import ReportModel from '../models/reportModel.js.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
@@ -81,6 +82,7 @@ export const getDashboardStats = async (req, res) => {
     const totalPins = await PinModel.countDocuments();
     const totalComments = await CommentModel.countDocuments();
     const totalPayments = await PaymentModel.countDocuments();
+    const pendingReports = await ReportModel.countDocuments({ status: 'pending' });
     const premiumUsers = await UserModel.countDocuments({ isPremium: true });
     
     const totalRevenue = await PaymentModel.aggregate([
@@ -106,6 +108,7 @@ export const getDashboardStats = async (req, res) => {
         totalPins,
         totalComments,
         totalPayments,
+        pendingReports,
         premiumUsers,
         totalRevenue: totalRevenue[0]?.total || 0,
       },
