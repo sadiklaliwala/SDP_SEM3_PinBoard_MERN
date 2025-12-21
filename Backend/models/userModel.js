@@ -72,6 +72,15 @@ const userSchema = mongoose.Schema(
     }],
     isPremium: { type: Boolean, default: false },
     premiumExpiry: Date,
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user'
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

@@ -9,6 +9,7 @@ import commentRouter from './routes/comment.routes.js';
 import session from 'express-session';
 import passport from './config/Passport.js';
 import paymentRouter from './routes/paymentRoutes.js';
+import adminRouter from './routes/admin.routes.js';
 
 
 // App Config
@@ -58,7 +59,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 // API Endpoints
-
+app.use('/api/admin', adminRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/pins', pinRouter);
