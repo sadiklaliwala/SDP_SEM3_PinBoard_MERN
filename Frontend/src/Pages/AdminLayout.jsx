@@ -1,11 +1,27 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AdminContext } from '../Context/AdminContext';
+import { ReportContext } from '../Context/ReportContext';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { adminLogout } = useContext(AdminContext);
+  const { getPendingReportsCount } = useContext(ReportContext);
+  const [pendingReports, setPendingReports] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchPendingReports();
+    const interval = setInterval(fetchPendingReports, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchPendingReports = async () => {
+    const result = await getPendingReportsCount();
+    if (result) {
+      setPendingReports(result.pendingReports);
+    }
+  };
 
   const menuItems = [
     {
@@ -29,6 +45,12 @@ const AdminLayout = () => {
       label: 'Comments',
     },
     {
+      path: '/admin/reports',
+      icon: 'fa-flag',
+      label: 'Reports',
+      badge: pendingReports,
+    },
+    {
       path: '/admin/payments',
       icon: 'fa-credit-card',
       label: 'Payments',
@@ -47,7 +69,6 @@ const AdminLayout = () => {
       <nav className="bg-white dark:bg-gray-800 shadow-lg fixed top-0 left-0 right-0 z-40">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Left: Menu Button & Logo */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -65,15 +86,7 @@ const AdminLayout = () => {
               </div>
             </div>
 
-            {/* Right: User & Logout */}
             <div className="flex items-center gap-4">
-              {/* <button
-                onClick={() => navigate('/')}
-                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                title="Back to Website"
-              >
-                <i className="fa-solid fa-home text-lg"></i>
-              </button> */}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -99,7 +112,7 @@ const AdminLayout = () => {
               to={item.path}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative ${
                   isActive
                     ? 'bg-red-600 text-white'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -108,6 +121,11 @@ const AdminLayout = () => {
             >
               <i className={`fa-solid ${item.icon} text-lg w-5`}></i>
               <span className="font-medium">{item.label}</span>
+              {item.badge && item.badge > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                  {item.badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </div>

@@ -28,6 +28,8 @@ import AdminUsers from "./Pages/AdminUsers";
 import AdminPins from "./Pages/AdminPins";
 import AdminComments from "./Pages/AdminComments";
 import AdminPayment from "./Pages/AdminPayment";
+import AdminReports from "./Pages/AdminReports";
+import MyReports from "./Pages/MyReports";
 
 function App() {
   const { currentUser, isAuthenticated, loading } = useContext(UserContext);
@@ -49,10 +51,10 @@ function App() {
                 path="pins"
                 element={
                   //<div className="p-6">
-                    //<h1 className="text-2xl font-bold">Pins Management</h1>
-                    //<p className="text-gray-600 dark:text-gray-400 mt-2">
-                     // Coming soon...
-                    //</p>
+                  //<h1 className="text-2xl font-bold">Pins Management</h1>
+                  //<p className="text-gray-600 dark:text-gray-400 mt-2">
+                  // Coming soon...
+                  //</p>
                   //</div>
                   <AdminPins />
                 }
@@ -81,6 +83,10 @@ function App() {
                   <AdminPayment />
                 }
               />
+              <Route 
+                path="reports" 
+                element={<AdminReports />} 
+              />
             </Route>
 
             {/* Regular App Routes */}
@@ -99,6 +105,16 @@ function App() {
                       path="/explore"
                       element={
                         !isAuthenticated ? <Explore /> : <Navigate to="/" />
+                      }
+                    />
+                    <Route
+                      path="/my-reports"
+                      element={
+                        isAuthenticated ? (
+                          <MyReports />
+                        ) : (
+                          <Navigate to="/login" />
+                        )
                       }
                     />
                     <Route path="create-pin" element={<CreatePin />} />
