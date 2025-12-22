@@ -4,6 +4,7 @@ import { Loading } from '../Components/Loading';
 import { UserContext } from '../Context/UserContext';
 import { PinContext } from '../Context/PinContext';
 import CommentItem from '../Components/CommentItem';
+import toast from 'react-hot-toast';
 
 const reactionsList = ['like', 'love', 'wow', 'sad', 'angry'];
 const reactionIcons = {
@@ -32,6 +33,8 @@ const PinPage = () => {
   const [localPin, setLocalPin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  // Share dropdown state
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -93,6 +96,64 @@ const PinPage = () => {
   const handleFollowUser = () => {
     if (localPin.owner && localPin.owner._id) {
       toggleFollowUnfollow(localPin.owner._id);
+    }
+  };
+
+  // Share functions
+  const handleCopyLink = async () => {
+    try {
+      const shareLink = `${window.location.origin}/pin/${pinId}`;
+      await navigator.clipboard.writeText(shareLink);
+      toast.success('Link copied to clipboard!');
+      setShowShareMenu(false);
+    } catch (error) {
+      toast.error('Failed to copy link');
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    const shareLink = `${window.location.origin}/pin/${pinId}`;
+    const message = `Check out this pin: ${localPin.title} - ${shareLink}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    setShowShareMenu(false);
+  };
+
+  const handleShareFacebook = () => {
+    const shareLink = `${window.location.origin}/pin/${pinId}`;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}`, '_blank');
+    setShowShareMenu(false);
+  };
+
+  const handleShareTwitter = () => {
+    const shareLink = `${window.location.origin}/pin/${pinId}`;
+    const text = `Check out: ${localPin.title}`;
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(text)}`, '_blank');
+    setShowShareMenu(false);
+  };
+
+  // Download function
+  const handleDownload = async () => {
+    try {
+      toast.loading('Downloading image...');
+      
+      const response = await fetch(localPin.image);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${localPin.title || 'pin'}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.dismiss();
+      toast.success('Image downloaded successfully!');
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to download image');
+      console.error('Download error:', error);
     }
   };
 
@@ -185,11 +246,73 @@ const PinPage = () => {
                   )}
                 </div>
 
-                {/* Share */}
-                <button className="px-4 py-2 bg-gray-200 dark:bg-neutral-700 rounded-full hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer flex items-center gap-2">
-                  <i className="fa-solid fa-share text-lg dark:text-gray-200"></i>
-                  <span className="font-medium text-sm text-gray-600 dark:text-gray-300">Share</span>
-                </button>
+                {/* Share Button with Dropdown */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowShareMenu(!showShareMenu)}
+                    className="px-4 py-2 bg-gray-200 dark:bg-neutral-700 rounded-full hover:bg-gray-300 dark:hover:bg-neutral-600 transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <i className="fa-solid fa-share text-lg dark:text-gray-200"></i>
+                    <span className="font-medium text-sm text-gray-600 dark:text-gray-300">Share</span>
+                  </button>
+
+                  {/* Share Dropdown Menu */}
+                  {showShareMenu && (
+                    <>
+                      <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-gray-200 dark:border-neutral-700 p-2 z-50">
+                        <button 
+                          onClick={handleCopyLink}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded text-left transition-colors"
+                        >
+                          <i className="fa-solid fa-link text-gray-600 dark:text-gray-300"></i>
+                          <span className="text-gray-800 dark:text-gray-200">Copy Link</span>
+                        </button>
+                        
+                        <button 
+                          onClick={handleShareWhatsApp}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded text-left transition-colors"
+                        >
+                          <i className="fa-brands fa-whatsapp text-green-600"></i>
+                          <span className="text-gray-800 dark:text-gray-200">WhatsApp</span>
+                        </button>
+                        
+                        <button 
+                          onClick={handleShareFacebook}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded text-left transition-colors"
+                        >
+                          <i className="fa-brands fa-facebook text-blue-600"></i>
+                          <span className="text-gray-800 dark:text-gray-200">Facebook</span>
+                        </button>
+                        
+                        <button 
+                          onClick={handleShareTwitter}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded text-left transition-colors"
+                        >
+                          <i className="fa-brands fa-twitter text-sky-500"></i>
+                          <span className="text-gray-800 dark:text-gray-200">Twitter</span>
+                        </button>
+
+                        {/* Divider */}
+                        <div className="border-t border-gray-200 dark:border-neutral-700 my-1"></div>
+
+                        {/* Download Button */}
+                        <button 
+                          onClick={handleDownload}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded text-left transition-colors"
+                        >
+                          <i className="fa-solid fa-download text-purple-600"></i>
+                          <span className="text-gray-800 dark:text-gray-200">Download</span>
+                        </button>
+                      </div>
+                      
+                      {/* Click outside to close */}
+                      <div 
+                        className="fixed inset-0 z-40" 
+                        onClick={() => setShowShareMenu(false)}
+                      />
+                    </>
+                  )}
+                </div>
 
                 {/* Menu */}
                 {isOwner && isAuthenticated && (
