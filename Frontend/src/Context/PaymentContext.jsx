@@ -1,12 +1,14 @@
-import axios from 'axios';
-import { createContext, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import axios from "axios";
+import { createContext, useContext, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { UserContext } from "./UserContext";
 
 export const PaymentContext = createContext();
 
 const PaymentContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState([]);
+  const { fetchMyProfile } = useContext(UserContext);
 
   const api = useMemo(() => {
     const backendUrl = "http://localhost:5000";
@@ -19,8 +21,8 @@ const PaymentContextProvider = ({ children }) => {
   // Load Razorpay script
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
@@ -28,19 +30,24 @@ const PaymentContextProvider = ({ children }) => {
   };
 
   // Create order and initiate payment
-  const initiatePayment = async (amount, description = 'Premium Subscription') => {
+  const initiatePayment = async (
+    amount,
+    description = "Premium Subscription"
+  ) => {
     setLoading(true);
     try {
       // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        toast.error('Failed to load Razorpay SDK. Please check your internet connection.');
+        toast.error(
+          "Failed to load Razorpay SDK. Please check your internet connection."
+        );
         setLoading(false);
         return;
       }
 
       // Create order on backend
-      const { data } = await api.post('/api/payment/create-order', {
+      const { data } = await api.post("/api/payment/create-order", {
         amount,
         description,
       });
@@ -56,7 +63,7 @@ const PaymentContextProvider = ({ children }) => {
         key: data.order.keyId, // Razorpay key from backend
         amount: data.order.amount * 100, // Amount in paise
         currency: data.order.currency,
-        name: 'Pinterest Clone',
+        name: "Pinterest Clone",
         description: description,
         order_id: data.order.orderId,
         handler: async (response) => {
@@ -68,18 +75,21 @@ const PaymentContextProvider = ({ children }) => {
           });
         },
         prefill: {
-          name: '', // Will be filled from user context if needed
-          email: '',
-          contact: '',
+          name: "", // Will be filled from user context if needed
+          email: "",
+          contact: "",
         },
         theme: {
-          color: '#DC2626', // Red color matching your app theme
+          color: "#DC2626", // Red color matching your app theme
         },
         modal: {
           ondismiss: async () => {
             // Payment cancelled
-            await handlePaymentFailure(data.order.orderId, 'Payment cancelled by user');
-            toast.info('Payment cancelled');
+            await handlePaymentFailure(
+              data.order.orderId,
+              "Payment cancelled by user"
+            );
+            toast.info("Payment cancelled");
             setLoading(false);
           },
         },
@@ -89,41 +99,73 @@ const PaymentContextProvider = ({ children }) => {
       razorpayInstance.open();
       setLoading(false);
     } catch (error) {
-      console.error('Payment initiation error:', error);
-      toast.error(error.response?.data?.message || 'Failed to initiate payment');
+      console.error("Payment initiation error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to initiate payment"
+      );
       setLoading(false);
     }
   };
 
-  // Verify payment on backend
   const verifyPayment = async (paymentData) => {
     try {
-      const { data } = await api.post('/api/payment/verify', paymentData);
+      const { data } = await api.post("/api/payment/verify", paymentData);
 
       if (data.success) {
-        toast.success('Payment successful! You are now a premium member 🎉');
-        // Reload user data or update context
+        // Show success message FIRST
+        toast.success("Payment successful! You are now a premium member 🎉", {
+          autoClose: 4000,
+        });
+
+        // Refetch user profile to update premium status (no reload needed)
+        await fetchMyProfile();
+
         return true;
       } else {
-        toast.error('Payment verification failed');
+        toast.error("Payment verification failed");
         return false;
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
-      toast.error(error.response?.data?.message || 'Payment verification failed');
+      console.error("Payment verification error:", error);
+      toast.error(
+        error.response?.data?.message || "Payment verification failed"
+      );
       return false;
     }
   };
 
+  // Verify payment on backend
+  // const verifyPayment = async (paymentData) => {
+  //   try {
+  //     const { data } = await api.post("/api/payment/verify", paymentData);
+
+  //     if (data.success) {
+  //       window.location.reload();
+  //       toast.success("Payment successful! You are now a premium member 🎉");
+  //       // Reload user data or update context
+  //       return true;
+  //     } else {
+  //       toast.error("Payment verification failed");
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     console.error("Payment verification error:", error);
+  //     toast.error(
+  //       error.response?.data?.message || "Payment verification failed"
+  //     );
+  //     return false;
+  //   }
+  // };
+
   // Handle payment failure
   const handlePaymentFailure = async (orderId, errorMessage) => {
     try {
-      await api.post('/api/payment/failure', {
+      await api.post("/api/payment/failure", {
         orderId,
         error: errorMessage,
       });
     } catch (error) {
-      console.error('Error handling payment failure:', error);
+      console.error("Error handling payment failure:", error);
     }
   };
 
@@ -131,13 +173,13 @@ const PaymentContextProvider = ({ children }) => {
   const fetchPaymentHistory = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/payment/history');
+      const { data } = await api.get("/api/payment/history");
       if (data.success) {
         setPaymentHistory(data.payments);
       }
     } catch (error) {
-      console.error('Error fetching payment history:', error);
-      toast.error('Failed to load payment history');
+      console.error("Error fetching payment history:", error);
+      toast.error("Failed to load payment history");
     } finally {
       setLoading(false);
     }
@@ -151,9 +193,7 @@ const PaymentContextProvider = ({ children }) => {
   };
 
   return (
-    <PaymentContext.Provider value={values}>
-      {children}
-    </PaymentContext.Provider>
+    <PaymentContext.Provider value={values}>{children}</PaymentContext.Provider>
   );
 };
 
