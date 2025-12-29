@@ -14,7 +14,7 @@ const UserContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const backendUrl = import.meta.env.BACKEND_URI  ||  "http://localhost:5000";
+  const backendUrl = process.env.BACKEND_URI  ||  "http://localhost:5000";
 
   // Create an axios instance with default configs
   const api = axios.create({
