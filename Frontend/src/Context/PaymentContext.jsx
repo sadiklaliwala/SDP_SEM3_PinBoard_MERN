@@ -11,7 +11,7 @@ const PaymentContextProvider = ({ children }) => {
   const { fetchMyProfile } = useContext(UserContext);
 
   const api = useMemo(() => {
-    const backendUrl = import.meta.env.BACKEND_URI  || "http://localhost:5000";
+    const backendUrl = process.env.BACKEND_URI || "http://localhost:5000";
     return axios.create({
       baseURL: backendUrl,
       withCredentials: true,
