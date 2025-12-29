@@ -52,9 +52,6 @@ npm install
 # Create environment file
 cp .env.example .env
 
-# Required .env variables:
-VITE_API_URL=http://localhost:5000
-
 # Run frontend
 npm run dev
 
